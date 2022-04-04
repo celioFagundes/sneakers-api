@@ -1,0 +1,22 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type PostPublic {
+  id: String
+  username: String
+  description: String
+}
+
+type Query {
+  getAllPosts: [PostPublic!]!
+}
+
+type Mutation {
+  createPost(input: PostCreateInput!): PostPublic!
+}
+
+input PostCreateInput {
+  username: String!
+  description: String!
+}
