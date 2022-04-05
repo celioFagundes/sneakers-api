@@ -24,6 +24,8 @@ import { PostModule } from './post/post.module'
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
+      introspection: true,
+      playground: true,
       context: ({ req, res }) => ({ req, res }),
     }),
     PostModule,
