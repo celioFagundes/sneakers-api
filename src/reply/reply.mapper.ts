@@ -2,7 +2,7 @@ import { Solution } from 'src/solution/solution.entity'
 import { User } from 'src/user/user.entity'
 import { ReplyCreateInput } from './dto/reply_create.input'
 import { ReplyUpdateInput } from './dto/reply_update.input'
-import { Reply } from './Reply.entity'
+import { Reply } from './reply.entity'
 
 export class ReplyMapper {
   public static toEntity(input: ReplyCreateInput): Reply {

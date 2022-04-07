@@ -2,7 +2,7 @@ import { Post } from 'src/post/post.entity'
 import { User } from 'src/user/user.entity'
 import { SolutionCreateInput } from './dto/solution_create.input'
 import { SolutionUpdateInput } from './dto/solution_update.input'
-import { Solution } from './Solution.entity'
+import { Solution } from './solution.entity'
 
 export class SolutionMapper {
   public static toEntity(input: SolutionCreateInput): Solution {
