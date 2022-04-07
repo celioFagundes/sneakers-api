@@ -6,6 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { PostModule } from './post/post.module'
+import { ReplyModule } from './reply/reply.module'
+import { SolutionModule } from './solution/solution.module'
+import { UserModule } from './user/user.module'
 
 @Module({
   imports: [
@@ -34,7 +37,10 @@ import { PostModule } from './post/post.module'
       playground: true,
       context: ({ req, res }) => ({ req, res }),
     }),
+    UserModule,
     PostModule,
+    SolutionModule,
+    ReplyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

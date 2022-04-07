@@ -1,8 +1,9 @@
 import { Field, ObjectType } from '@nestjs/graphql'
+import { SolutionPublic } from 'src/solution/dto/solution_public'
 import { UserPublic } from 'src/user/dto/user_public'
 
-@ObjectType('PostPublic')
-export class PostPublic {
+@ObjectType()
+export class ReplyPublic {
   @Field({ nullable: true })
   id: string
 
@@ -10,19 +11,10 @@ export class PostPublic {
   user: UserPublic
 
   @Field({ nullable: true })
-  title: string
-
-  @Field({ nullable: true })
-  slug: string
-
-  @Field({ nullable: true })
-  category: string
+  solution: SolutionPublic
 
   @Field({ nullable: true })
   description: string
-
-  @Field({ nullable: true })
-  solved: boolean
 
   @Field({ nullable: true })
   createdAt: Date
