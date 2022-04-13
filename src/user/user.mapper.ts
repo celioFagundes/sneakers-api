@@ -1,19 +1,22 @@
-import { UserCreateInput } from './dto/user_create.input'
-import { UserUpdateInput } from './dto/user_update.input'
 import { User } from './user.entity'
+import { UserCreateInput } from './dto/user-create.input'
+import { UserUpdateInput } from './dto/user-update.input'
 
 export class UserMapper {
   public static toEntity(input: UserCreateInput): User {
     const entity = new User()
-    entity.username = input.username
+    entity.name = input.name
     entity.email = input.email
     entity.password = input.password
+    entity.role = input.role
     return entity
   }
-  public static toEntityUpdate(input: UserUpdateInput): User {
+  public static toUpdateEntity(input: UserUpdateInput): User {
     const entity = new User()
     entity.id = input.id
-    entity.username = input.username
+    entity.name = input.name
+    entity.email = input.email
+    entity.role = input.role
     return entity
   }
 }

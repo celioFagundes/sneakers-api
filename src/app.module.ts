@@ -1,14 +1,15 @@
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { GraphQLModule } from '@nestjs/graphql'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { PostModule } from './post/post.module'
-import { ReplyModule } from './reply/reply.module'
-import { SolutionModule } from './solution/solution.module'
+import { GraphQLModule } from '@nestjs/graphql'
+import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo'
+import { CategoryModule } from './category/category.module'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ProductModule } from './product/product.module'
+import { BrandModule } from './brand/brand.module'
 import { UserModule } from './user/user.module'
+import { CoreModule } from './core/core.module'
 
 @Module({
   imports: [
@@ -33,14 +34,13 @@ import { UserModule } from './user/user.module'
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
-      introspection: true,
-      playground: true,
       context: ({ req, res }) => ({ req, res }),
     }),
+    CoreModule,
+    CategoryModule,
+    ProductModule,
+    BrandModule,
     UserModule,
-    PostModule,
-    SolutionModule,
-    ReplyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
