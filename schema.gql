@@ -73,6 +73,7 @@ type Query {
   getAllProducts: [ProductPublic!]!
   getProductsByCategory(categorySlug: String!): [ProductPublic!]!
   getProductsByBrand(brandSlug: String!): [ProductPublic!]!
+  getProductsByName(name: String!): [ProductPublic!]!
   getProductById(id: String!): ProductPublic!
   getProductBySlug(slug: String!): ProductPublic!
   getAllBrands: [Brand!]!

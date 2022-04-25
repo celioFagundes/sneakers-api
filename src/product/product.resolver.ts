@@ -28,6 +28,12 @@ export class ProductResolver {
   ): Promise<ProductPublic[]> {
     return await this.productService.getByBrand(brandSlug)
   }
+  @Query(returns => [ProductPublic], { name: 'getProductsByName' })
+  async getProductsByName(
+    @Args('name') name: string,
+  ): Promise<ProductPublic[]> {
+    return await this.productService.getByName(name)
+  }
   @Query(returns => ProductPublic, { name: 'getProductById' })
   async getProductById(@Args('id') id: string): Promise<ProductPublic> {
     return await this.productService.getById(id)

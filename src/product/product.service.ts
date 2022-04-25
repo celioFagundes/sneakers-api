@@ -33,6 +33,9 @@ export class ProductService {
     })
     return this.productRepository.find({ where: [{ brand: brand.id }] })
   }
+  async getByName(name: string): Promise<Product[]> {
+    return this.productRepository.find({ where: [{ name }] })
+  }
   async getById(id: string): Promise<Product> {
     return this.productRepository.findOne(id)
   }
