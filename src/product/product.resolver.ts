@@ -38,8 +38,13 @@ export class ProductResolver {
   async getProductsByBrandAndGender(
     @Args('brandSlug') brandSlug: string,
     @Args('gender') gender: string,
+    @Args('limit', { nullable: true }) limit: number,
   ): Promise<ProductPublic[]> {
-    return await this.productService.getByBrandAndGender(brandSlug, gender)
+    return await this.productService.getByBrandAndGender(
+      brandSlug,
+      gender,
+      limit,
+    )
   }
   @Query(returns => [ProductPublic], { name: 'getProductsByBrandLimited' })
   async getProductsByBrandLimited(

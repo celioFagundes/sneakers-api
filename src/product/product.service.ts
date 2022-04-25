@@ -45,10 +45,17 @@ export class ProductService {
   async getByBrandAndGender(
     brandSlug: string,
     gender: string,
+    limit: number,
   ): Promise<Product[]> {
     const brand = await this.brandRepository.findOne({
       where: [{ slug: brandSlug }],
     })
+    if (limit) {
+      return this.productRepository.find({
+        where: [{ brand: brand.id, gender: gender }],
+        take: limit,
+      })
+    }
     return this.productRepository.find({
       where: [{ brand: brand.id, gender: gender }],
     })
