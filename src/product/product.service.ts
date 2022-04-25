@@ -27,11 +27,40 @@ export class ProductService {
     })
     return this.productRepository.find({ where: [{ category: category.id }] })
   }
+  async getByCategoryLimited(categorySlug: string): Promise<Product[]> {
+    const category = await this.categoryRepository.findOne({
+      where: [{ slug: categorySlug }],
+    })
+    return this.productRepository.find({
+      where: [{ category: category.id }],
+      take: 5,
+    })
+  }
   async getByBrand(brandSlug: string): Promise<Product[]> {
     const brand = await this.brandRepository.findOne({
       where: [{ slug: brandSlug }],
     })
     return this.productRepository.find({ where: [{ brand: brand.id }] })
+  }
+  async getByBrandAndGender(
+    brandSlug: string,
+    gender: string,
+  ): Promise<Product[]> {
+    const brand = await this.brandRepository.findOne({
+      where: [{ slug: brandSlug }],
+    })
+    return this.productRepository.find({
+      where: [{ brand: brand.id, gender: gender }],
+    })
+  }
+  async getByBrandLimited(brandSlug: string): Promise<Product[]> {
+    const brand = await this.brandRepository.findOne({
+      where: [{ slug: brandSlug }],
+    })
+    return this.productRepository.find({
+      where: [{ brand: brand.id }],
+      take: 3,
+    })
   }
   async getByName(name: string): Promise<Product[]> {
     return this.productRepository.find({ where: [{ name }] })

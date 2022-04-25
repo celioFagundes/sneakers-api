@@ -22,11 +22,30 @@ export class ProductResolver {
   ): Promise<ProductPublic[]> {
     return await this.productService.getByCategory(categorySlug)
   }
+  @Query(returns => [ProductPublic], { name: 'getProductsByCategoryLimited' })
+  async getProductsByCategoryLimited(
+    @Args('categorySlug') categorySlug: string,
+  ): Promise<ProductPublic[]> {
+    return await this.productService.getByCategoryLimited(categorySlug)
+  }
   @Query(returns => [ProductPublic], { name: 'getProductsByBrand' })
   async getProductsByBrand(
     @Args('brandSlug') brandSlug: string,
   ): Promise<ProductPublic[]> {
     return await this.productService.getByBrand(brandSlug)
+  }
+  @Query(returns => [ProductPublic], { name: 'getProductsByBrandAndGender' })
+  async getProductsByBrandAndGender(
+    @Args('brandSlug') brandSlug: string,
+    @Args('gender') gender: string,
+  ): Promise<ProductPublic[]> {
+    return await this.productService.getByBrandAndGender(brandSlug, gender)
+  }
+  @Query(returns => [ProductPublic], { name: 'getProductsByBrandLimited' })
+  async getProductsByBrandLimited(
+    @Args('brandSlug') brandSlug: string,
+  ): Promise<ProductPublic[]> {
+    return await this.productService.getByBrandLimited(brandSlug)
   }
   @Query(returns => [ProductPublic], { name: 'getProductsByName' })
   async getProductsByName(
