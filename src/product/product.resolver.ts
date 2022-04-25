@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { AuthGuard } from 'src/utils/jwt-auth.guard'
 import { ProductPublic } from './dto/product'
 import { ProductCreateInput } from './dto/product-create.input'
@@ -38,7 +38,7 @@ export class ProductResolver {
   async getProductsByBrandAndGender(
     @Args('brandSlug') brandSlug: string,
     @Args('gender') gender: string,
-    @Args('limit', { nullable: true }) limit: number,
+    @Args('limit', { nullable: true, type: () => Int }) limit: number,
   ): Promise<ProductPublic[]> {
     return await this.productService.getByBrandAndGender(
       brandSlug,
