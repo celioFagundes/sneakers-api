@@ -57,7 +57,7 @@ export class ProductService {
       entity: Product,
       paginationKeys: ['id'],
       query: {
-        limit: 30,
+        limit: 6,
         order: 'ASC',
         afterCursor: afterCursor ? afterCursor : null,
         beforeCursor: beforeCursor ? beforeCursor : null,
