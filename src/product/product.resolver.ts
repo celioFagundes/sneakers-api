@@ -7,14 +7,17 @@ import { ProductUpdateInput } from './dto/product-update.input'
 import { ProductMapper } from './product.mapper'
 import { ProductService } from './product.service'
 import { GraphQLUpload, FileUpload } from 'graphql-upload'
-
+import { PagingResult } from './dto/paging-result'
 @Resolver(of => ProductPublic)
 export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
-  @Query(returns => [ProductPublic], { name: 'getAllProducts' })
-  async getAllProducts(): Promise<ProductPublic[]> {
-    return await this.productService.getAll()
+  @Query(returns => PagingResult, { name: 'getAllProducts' })
+  async getAllProducts(
+    @Args('afterCursor', { nullable: true }) afterCursor: string,
+    @Args('beforeCursor', { nullable: true }) beforeCursor: string,
+  ): Promise<PagingResult> {
+    return await this.productService.getAll(afterCursor, beforeCursor)
   }
   @Query(returns => [ProductPublic], { name: 'getProductsByCategory' })
   async getProductsByCategory(

@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { S3 } from 'src/utils/s3'
-import { getRepository, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
+import { buildPaginator } from 'typeorm-cursor-pagination'
 import { Product } from './product.entity'
 import * as sharp from 'sharp'
 import { Category } from 'src/category/category.entity'
 import { Brand } from '../brand/brand.entity'
+import { PagingResult } from './dto/paging-result'
 @Injectable()
 export class ProductService {
   constructor(
@@ -17,8 +19,26 @@ export class ProductService {
     private brandRepository: Repository<Brand>,
     private s3: S3,
   ) {}
-  async getAll(): Promise<Product[]> {
-    return this.productRepository.find({})
+  async getAll(
+    afterCursor: string,
+    beforeCursor: string,
+  ): Promise<PagingResult> {
+    const queryBuilder = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.brand', 'brand')
+    const paginator = buildPaginator({
+      entity: Product,
+      paginationKeys: ['id'],
+      query: {
+        limit: 2,
+        order: 'ASC',
+        afterCursor: afterCursor ? afterCursor : null,
+        beforeCursor: beforeCursor ? beforeCursor : null,
+      },
+    })
+    const { data, cursor } = await paginator.paginate(queryBuilder)
+    return { data, cursor }
   }
 
   async getByCategory(categorySlug: string): Promise<Product[]> {
