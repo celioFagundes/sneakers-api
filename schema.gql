@@ -80,7 +80,7 @@ type Query {
   getAllCategories: [Category!]!
   getCategoryById(id: String!): Category!
   getCategoryBySlug(slug: String!): Category!
-  getAllProducts(afterCursor: String, beforeCursor: String): PagingResult!
+  getAllProducts(input: ProductFilter, afterCursor: String, beforeCursor: String): PagingResult!
   getProductsByCategory(categorySlug: String!): [ProductPublic!]!
   getProductsByCategoryLimited(categorySlug: String!): [ProductPublic!]!
   getProductsByBrand(brandSlug: String!): [ProductPublic!]!
@@ -97,6 +97,12 @@ type Query {
   panelGetUserByEmail(email: String!): User!
   panelGetMe: User!
   panelGetAllUserSessions(id: String!): [AuthSession!]!
+}
+
+input ProductFilter {
+  brandSlug: String
+  categorySlug: String
+  gender: String
 }
 
 type Mutation {

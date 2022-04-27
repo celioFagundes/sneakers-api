@@ -8,16 +8,18 @@ import { ProductMapper } from './product.mapper'
 import { ProductService } from './product.service'
 import { GraphQLUpload, FileUpload } from 'graphql-upload'
 import { PagingResult } from './dto/paging-result'
+import { ProductFilter } from './dto/product-filter'
 @Resolver(of => ProductPublic)
 export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
   @Query(returns => PagingResult, { name: 'getAllProducts' })
   async getAllProducts(
+    @Args('input', { nullable: true }) input: ProductFilter,
     @Args('afterCursor', { nullable: true }) afterCursor: string,
     @Args('beforeCursor', { nullable: true }) beforeCursor: string,
   ): Promise<PagingResult> {
-    return await this.productService.getAll(afterCursor, beforeCursor)
+    return await this.productService.getAll(input, afterCursor, beforeCursor)
   }
   @Query(returns => [ProductPublic], { name: 'getProductsByCategory' })
   async getProductsByCategory(
