@@ -27,6 +27,18 @@ export class ProductResolver {
   ): Promise<ProductPublic[]> {
     return await this.productService.getByCategory(categorySlug)
   }
+  @Query(returns => [ProductPublic], { name: 'getProductsByCategoryAndGender' })
+  async getProductsByCategoryAndGender(
+    @Args('categorySlug') categorySlug: string,
+    @Args('gender') gender: string,
+    @Args('limit', { nullable: true, type: () => Int }) limit: number,
+  ): Promise<ProductPublic[]> {
+    return await this.productService.getByCategoryAndGender(
+      categorySlug,
+      gender,
+      limit,
+    )
+  }
   @Query(returns => [ProductPublic], { name: 'getProductsByCategoryLimited' })
   async getProductsByCategoryLimited(
     @Args('categorySlug') categorySlug: string,

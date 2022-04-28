@@ -73,6 +73,24 @@ export class ProductService {
     })
     return this.productRepository.find({ where: [{ category: category.id }] })
   }
+  async getByCategoryAndGender(
+    categorySlug: string,
+    gender: string,
+    limit: number,
+  ): Promise<Product[]> {
+    const category = await this.categoryRepository.findOne({
+      where: [{ slug: categorySlug }],
+    })
+    if (limit) {
+      return this.productRepository.find({
+        where: [{ category: category.id, gender: gender }],
+        take: limit,
+      })
+    }
+    return this.productRepository.find({
+      where: [{ category: category.id, gender: gender }],
+    })
+  }
   async getByCategoryLimited(categorySlug: string): Promise<Product[]> {
     const category = await this.categoryRepository.findOne({
       where: [{ slug: categorySlug }],
