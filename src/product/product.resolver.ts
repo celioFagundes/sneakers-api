@@ -13,6 +13,10 @@ import { ProductFilter } from './dto/product-filter'
 export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
+  @Query(returns => [ProductPublic], { name: 'getAllProductsNoFilter' })
+  async getAllProductsNoFilter(): Promise<ProductPublic[]> {
+    return await this.productService.getAllNoFilter()
+  }
   @Query(returns => PagingResult, { name: 'getAllProducts' })
   async getAllProducts(
     @Args('input', { nullable: true }) input: ProductFilter,

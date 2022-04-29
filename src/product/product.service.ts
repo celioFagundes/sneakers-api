@@ -20,6 +20,10 @@ export class ProductService {
     private brandRepository: Repository<Brand>,
     private s3: S3,
   ) {}
+
+  async getAllNoFilter(): Promise<Product[]> {
+    return this.productRepository.find({})
+  }
   async getAll(
     input: ProductFilter,
     afterCursor: string,
