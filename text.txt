@@ -1,0 +1,130 @@
+import { Test, TestingModule } from '@nestjs/testing'
+import { getRepositoryToken } from '@nestjs/typeorm'
+import { S3 } from '../utils/s3'
+import TestUtil from '../core/test/TestUtil'
+import { Brand } from './brand.entity'
+import { BrandService } from './brand.service'
+
+const mS3Instance = {
+  upload: jest.fn().mockReturnThis(),
+  promise: jest.fn(),
+  deleteObject: jest.fn().mockReturnThis(),
+}
+jest.mock('fs')
+
+describe('brand service', () => {
+  let service: BrandService
+  const brandMockRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
+    update: jest.fn(),
+  }
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BrandService,
+        {
+          provide: getRepositoryToken(Brand),
+          useValue: brandMockRepository,
+        },
+        {
+          provide: S3,
+          useFactory: () => mS3Instance,
+        },
+      ],
+    }).compile()
+    service = module.get<BrandService>(BrandService)
+  })
+
+  beforeEach(() => {
+    brandMockRepository.find.mockReset()
+    brandMockRepository.findOne.mockReset()
+    brandMockRepository.save.mockReset()
+    brandMockRepository.delete.mockReset()
+    brandMockRepository.update.mockReset()
+  })
+  it('should be defined', () => {
+    expect(service).toBeDefined()
+  })
+  describe('getAll', () => {
+    it(' should list all brands', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brandMockRepository.find.mockReturnValue([brand, brand])
+      const brands = await service.getAll()
+      expect(brands).toHaveLength(2)
+      expect(brandMockRepository.find).toBeCalledTimes(1)
+    })
+  })
+  describe('getById', () => {
+    it('should find brand that matches id', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      const brandFound = await service.getById('1')
+      expect(brandFound).toMatchObject({
+        id: brand.id,
+        name: brand.name,
+        slug: brand.slug,
+      })
+      expect(brandMockRepository.findOne).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('getBySlug', () => {
+    it('should find a brand that matches the slug', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      const brandFound = await service.getBySlug('Valid slug')
+      expect(brandFound).toMatchObject({
+        id: brand.id,
+        name: brand.name,
+        slug: brand.slug,
+      })
+      expect(brandMockRepository.findOne).toHaveBeenCalledTimes(1)
+    })
+  })
+  describe('create', () => {
+    it('should create a brand', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brandMockRepository.save.mockReturnValue(brand)
+      const savedBrand = await service.create(brand)
+      expect(savedBrand).toMatchObject(brand)
+      expect(brandMockRepository.save).toBeCalledTimes(1)
+    })
+  })
+  describe('update', () => {
+    it('should update a brand', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brandMockRepository.update.mockReturnValue(brand)
+      const updatedBrand = await service.update(brand)
+      expect(updatedBrand).toMatchObject(brand)
+      expect(brandMockRepository.update).toBeCalledTimes(1)
+    })
+  })
+  describe('upload a brand logo', () => {
+    it('should upload when brand doenst have a logo', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brand.logo = null
+      const mockReadStream = {
+        pipe: jest.fn().mockReturnThis(),
+      }
+      const stream = mockReadStream
+      const url = await mS3Instance.upload(
+        stream,
+        'file',
+        'bucket-url',
+        'filename',
+      )
+      brandMockRepository.update.mockReturnValue({
+        ...brand,
+        logo: url,
+      })
+      const updatedBrand = await service.update(brand)
+      expect(updatedBrand).toBe(true)
+      expect(mS3Instance.upload).toBeCalledTimes(1)
+      expect(brandMockRepository.update).toBeCalledTimes(1)
+    })
+  })
+})

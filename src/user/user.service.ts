@@ -28,27 +28,25 @@ export class UserService {
     return this.userRepository.save(input)
   }
   async update(input: User): Promise<User> {
-    const entity = await this.userRepository.findOne(input.id)
-    entity.name = input.name
-    entity.email = input.email
-    entity.password = input.password
-    entity.role = input.role
-    await this.userRepository.save(entity)
+    await this.userRepository.update(input.id, {
+      name: input.name,
+      email: input.email,
+      role: input.role,
+    })
     return input
   }
   async changePassword(id: string, newPassword: string): Promise<boolean> {
-    const entity = await this.userRepository.findOne(id)
-    entity.password = newPassword
-    await this.userRepository.save(entity)
+    await this.userRepository.update(id, {
+      password: newPassword,
+    })
     return true
   }
   async delete(id: string): Promise<boolean> {
-    try {
-      await this.userRepository.delete(id)
+    const deleted = await this.userRepository.delete(id)
+    if (deleted) {
       return true
-    } catch (err) {
-      return false
     }
+    return false
   }
   async auth(
     email: string,

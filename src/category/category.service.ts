@@ -29,11 +29,10 @@ export class CategoryService {
     return input
   }
   async delete(id: string): Promise<boolean> {
-    try {
-      await this.categoryRepository.delete(id)
+    const deleted = await this.categoryRepository.delete(id)
+    if (deleted) {
       return true
-    } catch (err) {
-      return false
     }
+    return false
   }
 }

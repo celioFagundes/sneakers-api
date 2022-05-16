@@ -71,7 +71,7 @@ export class UserResolver {
   ): Promise<boolean> {
     return this.userService.changePassword(input.id, input.password)
   }
-  @UseGuards(AuthGuard)
+
   @Mutation(returns => Boolean, { name: 'panelDeleteUser' })
   async deleteUser(@Args('id') input: string): Promise<boolean> {
     return this.userService.delete(input)

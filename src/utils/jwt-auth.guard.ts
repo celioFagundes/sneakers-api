@@ -20,11 +20,6 @@ export class AuthGuard implements CanActivate {
           payload.scope.indexOf('admin') >= 0
         ) {
           req.user = payload.id
-          console.log(
-            'user => ',
-            req.user,
-            JSON.stringify(payload.scope.indexOf('admin') >= 0),
-          )
           return true
         } else {
           return false

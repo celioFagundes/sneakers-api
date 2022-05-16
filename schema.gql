@@ -80,8 +80,10 @@ type Query {
   getAllCategories: [Category!]!
   getCategoryById(id: String!): Category!
   getCategoryBySlug(slug: String!): Category!
+  getAllProductsNoFilter: [ProductPublic!]!
   getAllProducts(input: ProductFilter, afterCursor: String, beforeCursor: String): PagingResult!
   getProductsByCategory(categorySlug: String!): [ProductPublic!]!
+  getProductsByCategoryAndGender(categorySlug: String!, gender: String!, limit: Int): [ProductPublic!]!
   getProductsByCategoryLimited(categorySlug: String!): [ProductPublic!]!
   getProductsByBrand(brandSlug: String!): [ProductPublic!]!
   getProductsByBrandAndGender(brandSlug: String!, gender: String!, limit: Int): [ProductPublic!]!

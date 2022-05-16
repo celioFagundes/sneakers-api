@@ -34,11 +34,11 @@ export class S3 {
       Bucket: bucket,
       Key: destinationFilename,
     }
-    try {
-      await s3.deleteObject(s3Params).promise()
+
+    const upload = await s3.deleteObject(s3Params).promise()
+    if (upload) {
       return true
-    } catch (err) {
-      return false
     }
+    return false
   }
 }

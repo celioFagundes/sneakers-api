@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { S3 } from 'src/utils/s3'
+import { S3 } from '../utils/s3'
 import { Repository } from 'typeorm'
 import { Brand } from './brand.entity'
 import * as sharp from 'sharp'
@@ -31,20 +31,16 @@ export class BrandService {
     return input
   }
   async delete(id: string): Promise<boolean> {
-    try {
-      const brand = await this.brandRepository.findOne(id)
-      if (!brand) {
-        return false
-      }
+    const brand = await this.brandRepository.findOne(id)
+    if (brand) {
       if (brand.logo) {
         const filename = brand.logo.split('.com/')[1]
         await this.s3.deleteObject('devshop-assets-2022', filename)
       }
       await this.brandRepository.delete(id)
       return true
-    } catch (err) {
-      return false
     }
+    return false
   }
   async uploadLogo(
     id: string,
@@ -53,24 +49,24 @@ export class BrandService {
     mimetype: string,
   ): Promise<boolean> {
     const brand = await this.brandRepository.findOne(id)
-    if (!brand) {
-      return false
+    if (brand) {
+      if (brand.logo) {
+        const filename = brand.logo.split('.com/')[1]
+        await this.s3.deleteObject('devshop-assets-2022', filename)
+      }
+      const stream = createReadStream().pipe(sharp().resize(300))
+      const url = await this.s3.upload(
+        stream,
+        mimetype,
+        'devshop-assets-2022',
+        id + '-' + filename,
+      )
+      await this.brandRepository.update(id, {
+        logo: url,
+      })
+      return true
     }
-    if (brand.logo) {
-      const filename = brand.logo.split('.com/')[1]
-      await this.s3.deleteObject('devshop-assets-2022', filename)
-    }
-    const stream = createReadStream().pipe(sharp().resize(300))
-    const url = await this.s3.upload(
-      stream,
-      mimetype,
-      'devshop-assets-2022',
-      id + '-' + filename,
-    )
-    await this.brandRepository.update(id, {
-      logo: url,
-    })
-    return true
+    return false
   }
   async removeBrandLogo(id: string): Promise<boolean> {
     const brand = await this.brandRepository.findOne(id)
