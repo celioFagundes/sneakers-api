@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { User, UserRole } from './user.entity'
+import { User } from './user.entity'
 import { UserService } from './user.service'
 import { AuthToken } from './auth-token.entity'
 import TestUtil from '../core/test/TestUtil'
@@ -136,6 +136,42 @@ describe('UserService', () => {
       userMockRepository.delete.mockReturnValue(null)
       expect(await service.delete('9')).toBe(false)
       expect(userMockRepository.delete).toBeCalledTimes(1)
+    })
+  })
+  describe('auth', () => {
+    it('should success authentication', async () => {
+      const user = TestUtil.giveMeAValidUser()
+      const token = TestUtil.giveMeAValidAuthToken()
+      token.user = user
+      token.userAgent = 'new user agent'
+      const spy = jest.spyOn(user, 'checkPassword').mockResolvedValue(true)
+      userMockRepository.findOne.mockReturnValue(user)
+      authMockRepository.save.mockReturnValue(token)
+      const auth = await service.auth('email', 'password', 'userAgent')
+      expect(auth).toStrictEqual([user, token])
+      expect(authMockRepository.save).toBeCalledTimes(1)
+      expect(userMockRepository.findOne).toBeCalledTimes(1)
+      expect(spy).toBeCalledTimes(1)
+    })
+    it('should fail authentication by wrong password', async () => {
+      const user = TestUtil.giveMeAValidUser()
+      const spy = jest.spyOn(user, 'checkPassword').mockResolvedValue(false)
+      userMockRepository.findOne.mockReturnValue(user)
+      const auth = await service.auth('email', 'password', 'userAgent')
+      expect(auth).toStrictEqual([null, null])
+      expect(authMockRepository.save).toBeCalledTimes(0)
+      expect(userMockRepository.findOne).toBeCalledTimes(1)
+      expect(spy).toBeCalledTimes(1)
+    })
+    it('should fail authentication by user not found', async () => {
+      const user = TestUtil.giveMeAValidUser()
+      const spy = jest.spyOn(user, 'checkPassword').mockResolvedValue(false)
+      userMockRepository.findOne.mockReturnValue(null)
+      const auth = await service.auth('email', 'password', 'userAgent')
+      expect(auth).toStrictEqual([null, null])
+      expect(authMockRepository.save).toBeCalledTimes(0)
+      expect(userMockRepository.findOne).toBeCalledTimes(1)
+      expect(spy).toBeCalledTimes(0)
     })
   })
 })

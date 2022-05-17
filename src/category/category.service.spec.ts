@@ -98,7 +98,7 @@ describe('Category service', () => {
       expect(deleted).toBe(true)
       expect(categoryMockRepository.delete).toBeCalledTimes(1)
     })
-    it('should not delete a user', async () => {
+    it('should not delete a category', async () => {
       categoryMockRepository.delete.mockReturnValue(null)
       expect(await service.delete('9')).toBe(false)
       expect(categoryMockRepository.delete).toBeCalledTimes(1)
