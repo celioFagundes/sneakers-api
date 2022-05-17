@@ -174,13 +174,26 @@ describe('UserService', () => {
       expect(spy).toBeCalledTimes(0)
     })
   })
-  describe('get refresh token', () => {
+  describe('getRefreshToken', () => {
     it('should return a refresh token', async () => {
       const refreshToken = TestUtil.giveMeAValidAuthToken()
       authMockRepository.findOne.mockReturnValue(refreshToken)
       authMockRepository.save.mockReturnValue(refreshToken)
       const getToken = await service.getRefreshToken('1')
       expect(getToken).toBe(refreshToken)
+      expect(authMockRepository.findOne).toBeCalledTimes(1)
+      expect(authMockRepository.save).toBeCalledTimes(1)
+    })
+  })
+  describe('invalidateRefreshToken', () => {
+    it('should invalidate a refresh token', async () => {
+      const refreshToken = TestUtil.giveMeAValidAuthToken()
+      refreshToken.active = false
+      authMockRepository.findOne.mockReturnValue(refreshToken)
+      authMockRepository.save.mockReturnValue(refreshToken)
+      const getToken = await service.invalidateRefreshToken('1')
+      expect(getToken).toBe(true)
+      expect(refreshToken.active).toBe(false)
       expect(authMockRepository.findOne).toBeCalledTimes(1)
       expect(authMockRepository.save).toBeCalledTimes(1)
     })
