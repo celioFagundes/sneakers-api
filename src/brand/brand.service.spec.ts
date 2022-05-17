@@ -4,6 +4,7 @@ import { S3 } from '../utils/s3'
 import TestUtil from '../core/test/TestUtil'
 import { Brand } from './brand.entity'
 import { BrandService } from './brand.service'
+import { Readable } from 'stream'
 
 describe('brand service', () => {
   let service: BrandService
@@ -146,29 +147,22 @@ describe('brand service', () => {
       expect(brandMockRepository.findOne).toBeCalledTimes(1)
     })
   })
-  /*describe('upload a brand logo', () => {
+  describe('upload a brand logo', () => {
     it('should upload when brand doenst have a logo', async () => {
       const brand = TestUtil.giveMeAValidBrand()
       brandMockRepository.findOne.mockReturnValue({ ...brand, logo: null })
-      mS3Instance.upload.mockReturnValue('www.amazon.com/s3/bucket/filename')
-      const mockCreateReadStream = jest.fn().mockReturnThis()
-      const mockStreamPipe = { pipe: jest.fn().mockReturnThis() }
-      mockCreateReadStream.mockReturnValueOnce(mockStreamPipe)
-      const stream = mockCreateReadStream()
-
-      const url = await mS3Instance.upload(
-        stream,
-        'file',
-        'bucket-url',
-        'filename',
-      )
       brandMockRepository.update.mockReturnValue({
         ...brand,
-        logo: url,
+        logo: 'www.amazon.com/s3/bucket/filename',
       })
+
+      mS3Instance.upload.mockReturnValue('www.amazon.com/s3/bucket/filename')
+      const mockedStream = jest
+        .fn()
+        .mockReturnValue({ pipe: jest.fn().mockReturnValue(true) })
       const updatedBrand = await service.uploadLogo(
         '1',
-        mockCreateReadStream,
+        mockedStream,
         'filename',
         'file',
       )
@@ -177,5 +171,5 @@ describe('brand service', () => {
       expect(brandMockRepository.findOne).toBeCalledTimes(1)
       expect(brandMockRepository.update).toBeCalledTimes(1)
     })
-  })*/
+  })
 })

@@ -4,6 +4,8 @@ import { S3 } from '../utils/s3'
 import { Repository } from 'typeorm'
 import { Brand } from './brand.entity'
 import * as sharp from 'sharp'
+import { Readable } from 'stream'
+import { ReadStream } from 'fs'
 @Injectable()
 export class BrandService {
   constructor(
