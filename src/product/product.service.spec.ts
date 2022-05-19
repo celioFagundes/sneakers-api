@@ -73,6 +73,25 @@ describe('Product service', () => {
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
+  describe('getByBrandLimited', () =>
+    it('should return limited products that matches the brand', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      const product = TestUtil.giveMeAValidProduct()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productByName = await service.getByBrandLimited('Valid Brand')
+      expect(productByName).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(brandMockRepository.findOne).toBeCalledTimes(1)
+    }))
+  describe('getByName', () =>
+    it('should return a product that matches the name', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productByName = await service.getByName('Valid Name')
+      expect(productByName).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+    }))
   describe('getById', () =>
     it('should return a product that matches the id', async () => {
       const product = TestUtil.giveMeAValidProduct()
