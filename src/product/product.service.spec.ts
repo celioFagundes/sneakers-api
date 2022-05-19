@@ -85,8 +85,38 @@ describe('Product service', () => {
     it('should return a product that matches the slug', async () => {
       const product = TestUtil.giveMeAValidProduct()
       productMockRepository.findOne.mockReturnValue(product)
-      const productById = await service.getBySlug('Valid Slug')
-      expect(productById).toMatchObject(product)
+      const productBySlug = await service.getBySlug('Valid Slug')
+      expect(productBySlug).toMatchObject(product)
       expect(productMockRepository.findOne).toBeCalledTimes(1)
     }))
+  describe('create', () =>
+    it('should create a product', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      productMockRepository.save.mockReturnValue(product)
+      const productCreated = await service.create(product)
+      expect(productCreated).toMatchObject(product)
+      expect(productMockRepository.save).toBeCalledTimes(1)
+    }))
+  describe('update', () =>
+    it('should update a product', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      productMockRepository.update.mockReturnValue(product)
+      const productUpdated = await service.update(product)
+      expect(productUpdated).toMatchObject(product)
+      expect(productMockRepository.update).toBeCalledTimes(1)
+    }))
+  describe('delete', () => {
+    it('should success to delete a product', async () => {
+      productMockRepository.delete.mockResolvedValue(true)
+      const productDeleted = await service.delete('1')
+      expect(productDeleted).toBe(true)
+      expect(productMockRepository.delete).toBeCalledTimes(1)
+    })
+    it('should fail to delete a product', async () => {
+      productMockRepository.delete.mockRejectedValue(false)
+      const productDeleted = await service.delete('1')
+      expect(productDeleted).toBe(false)
+      expect(productMockRepository.delete).toBeCalledTimes(1)
+    })
+  })
 })
