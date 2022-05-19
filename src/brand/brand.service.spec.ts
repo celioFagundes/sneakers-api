@@ -4,7 +4,6 @@ import { S3 } from '../utils/s3'
 import TestUtil from '../core/test/TestUtil'
 import { Brand } from './brand.entity'
 import { BrandService } from './brand.service'
-import { Readable } from 'stream'
 
 describe('brand service', () => {
   let service: BrandService
@@ -157,9 +156,12 @@ describe('brand service', () => {
       })
 
       mS3Instance.upload.mockReturnValue('www.amazon.com/s3/bucket/filename')
+      const mockSharp = jest
+        .fn()
+        .mockReturnValue({ resize: jest.fn().mockReturnValue(true) })
       const mockedStream = jest
         .fn()
-        .mockReturnValue({ pipe: jest.fn().mockReturnValue(true) })
+        .mockReturnValue({ pipe: jest.fn().mockReturnValue(mockSharp()) })
       const updatedBrand = await service.uploadLogo(
         '1',
         mockedStream,
@@ -167,9 +169,66 @@ describe('brand service', () => {
         'file',
       )
       expect(updatedBrand).toBe(true)
+      expect(mockedStream).toBeCalledTimes(1)
+      expect(mockSharp).toBeCalledTimes(1)
       expect(mS3Instance.upload).toBeCalledTimes(1)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(0)
       expect(brandMockRepository.findOne).toBeCalledTimes(1)
       expect(brandMockRepository.update).toBeCalledTimes(1)
+    })
+    it('should upload when brand already have a logo', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      brandMockRepository.update.mockReturnValue({
+        ...brand,
+        logo: 'www.amazon.com/s3/bucket/filename',
+      })
+
+      mS3Instance.deleteObject.mockReturnValue(true)
+      mS3Instance.upload.mockReturnValue('www.amazon.com/s3/bucket/filename')
+      const mockSharp = jest
+        .fn()
+        .mockReturnValue({ resize: jest.fn().mockReturnValue(true) })
+      const mockedStream = jest
+        .fn()
+        .mockReturnValue({ pipe: jest.fn(() => mockSharp()) })
+      const updatedBrand = await service.uploadLogo(
+        '1',
+        mockedStream,
+        'filename',
+        'file',
+      )
+      expect(updatedBrand).toBe(true)
+      expect(mockedStream).toBeCalledTimes(1)
+      expect(mockSharp).toBeCalledTimes(1)
+      expect(mS3Instance.upload).toBeCalledTimes(1)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(1)
+      expect(brandMockRepository.findOne).toBeCalledTimes(1)
+      expect(brandMockRepository.update).toBeCalledTimes(1)
+    })
+    it('should not upload  a logo', async () => {
+      brandMockRepository.findOne.mockReturnValue(null)
+      mS3Instance.deleteObject.mockReturnValue(true)
+      mS3Instance.upload.mockReturnValue('www.amazon.com/s3/bucket/filename')
+      const mockSharp = jest
+        .fn()
+        .mockReturnValue({ resize: jest.fn().mockReturnValue(true) })
+      const mockedStream = jest
+        .fn()
+        .mockReturnValue({ pipe: jest.fn(() => mockSharp()) })
+      const updatedBrand = await service.uploadLogo(
+        '1',
+        mockedStream,
+        'filename',
+        'file',
+      )
+      expect(updatedBrand).toBe(false)
+      expect(mockedStream).toBeCalledTimes(0)
+      expect(mockSharp).toBeCalledTimes(0)
+      expect(mS3Instance.upload).toBeCalledTimes(0)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(0)
+      expect(brandMockRepository.findOne).toBeCalledTimes(1)
+      expect(brandMockRepository.update).toBeCalledTimes(0)
     })
   })
 })

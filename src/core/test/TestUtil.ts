@@ -1,8 +1,30 @@
+import { Product, ProductGender } from '../../product/product.entity'
 import { Brand } from '../../brand/brand.entity'
 import { Category } from '../../category/category.entity'
 import { AuthToken } from '../../user/auth-token.entity'
 import { User, UserRole } from '../../user/user.entity'
 export default class TestUtil {
+  static giveMeAValidProduct(): Product {
+    const product = new Product()
+    const category = new Category()
+    const brand = new Brand()
+    product.id = '1'
+    product.name = 'Valid name'
+    product.slug = 'Valid slug'
+    product.category = category
+    product.brand = brand
+    product.description = 'Valid Description'
+    product.price = 199
+    product.gender = ProductGender.MEN
+    product.material = 'Fiber'
+    product.color = { colorName: 'Black', colorCode: '#000' }
+    product.images = []
+    product.variations = [
+      { size: '10', weight: 100, sku: 'VALIDSKU1', stock: 100 },
+      { size: '11', weight: 101, sku: 'VALIDSKU2', stock: 101 },
+    ]
+    return product
+  }
   static giveMeAValidCategory(): Category {
     const category = new Category()
     category.id = '1'

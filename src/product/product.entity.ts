@@ -1,6 +1,6 @@
 import { registerEnumType } from '@nestjs/graphql'
-import { Brand } from 'src/brand/brand.entity'
-import { Category } from 'src/category/category.entity'
+import { Brand } from '../brand/brand.entity'
+import { Category } from '../category/category.entity'
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 interface Color {
