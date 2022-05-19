@@ -61,11 +61,8 @@ describe('Product service', () => {
   })
 
   beforeEach(() => {
-    productMockRepository.find.mockReset()
-    productMockRepository.findOne.mockReset()
-    productMockRepository.save.mockReset()
-    productMockRepository.delete.mockReset()
-    productMockRepository.update.mockReset()
+    jest.resetAllMocks()
+
     mS3Instance.deleteObject.mockReset()
     mS3Instance.promise.mockReset()
     mS3Instance.upload.mockReset()
@@ -73,14 +70,63 @@ describe('Product service', () => {
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
+  describe('getByBrand', () =>
+    it('should return a product that matches the brand', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      const product = TestUtil.giveMeAValidProduct()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productByName = await service.getByBrand('Valid brand')
+      expect(productByName).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+    }))
+  describe('getByBrandAndGender', () => {
+    it('should return limited products that matches the brand and gender', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      const product = TestUtil.giveMeAValidProduct()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productByBrandAndGender = await service.getByBrandAndGender(
+        'Valid Brand',
+        'Valid Gender',
+        3,
+      )
+      expect(productByBrandAndGender).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(brandMockRepository.findOne).toBeCalledTimes(1)
+    })
+    it('should return unlimited products that matches the brand and gender', async () => {
+      const brand = TestUtil.giveMeAValidBrand()
+      const product = TestUtil.giveMeAValidProduct()
+      brandMockRepository.findOne.mockReturnValue(brand)
+      productMockRepository.find.mockReturnValue([
+        product,
+        product,
+        product,
+        product,
+        product,
+        product,
+      ])
+      const productByBrandAndGender = await service.getByBrandAndGender(
+        'Valid Brand',
+        'Valid Gender',
+        null,
+      )
+      expect(productByBrandAndGender).toHaveLength(6)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(brandMockRepository.findOne).toBeCalledTimes(1)
+    })
+  })
   describe('getByBrandLimited', () =>
     it('should return limited products that matches the brand', async () => {
       const brand = TestUtil.giveMeAValidBrand()
       const product = TestUtil.giveMeAValidProduct()
       brandMockRepository.findOne.mockReturnValue(brand)
       productMockRepository.find.mockReturnValue([product, product, product])
-      const productByName = await service.getByBrandLimited('Valid Brand')
-      expect(productByName).toHaveLength(3)
+      const productByBrandLimited = await service.getByBrandLimited(
+        'Valid Brand',
+      )
+      expect(productByBrandLimited).toHaveLength(3)
       expect(productMockRepository.find).toBeCalledTimes(1)
       expect(brandMockRepository.findOne).toBeCalledTimes(1)
     }))
