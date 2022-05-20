@@ -18,7 +18,7 @@ export default class TestUtil {
     product.gender = ProductGender.MEN
     product.material = 'Fiber'
     product.color = { colorName: 'Black', colorCode: '#000' }
-    product.images = []
+    product.images = null
     product.variations = [
       { size: '10', weight: 100, sku: 'VALIDSKU1', stock: 100 },
       { size: '11', weight: 101, sku: 'VALIDSKU2', stock: 101 },

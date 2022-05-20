@@ -254,4 +254,107 @@ describe('Product service', () => {
       expect(productMockRepository.delete).toBeCalledTimes(1)
     })
   })
+
+  describe('uploadProductImage', () => {
+    it('should upload a product image', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      productMockRepository.findOne.mockReturnValue({ ...product, logo: null })
+      productMockRepository.update.mockReturnValue({
+        ...product,
+        images: ['www.amazon.com/s3/bucket/filename'],
+      })
+
+      mS3Instance.upload.mockReturnValue('www.amazon.com/s3/bucket/filename')
+      const mockSharp = jest
+        .fn()
+        .mockReturnValue({ resize: jest.fn().mockReturnValue(true) })
+      const mockedStream = jest
+        .fn()
+        .mockReturnValue({ pipe: jest.fn().mockReturnValue(mockSharp()) })
+      const updatedProduct = await service.uploadProductImage(
+        '1',
+        mockedStream,
+        'filename',
+        'file',
+      )
+      expect(updatedProduct).toBe(true)
+      expect(mockedStream).toBeCalledTimes(1)
+      expect(mockSharp).toBeCalledTimes(1)
+      expect(mS3Instance.upload).toBeCalledTimes(1)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(0)
+      expect(productMockRepository.findOne).toBeCalledTimes(1)
+      expect(productMockRepository.update).toBeCalledTimes(1)
+    })
+    it('should not upload because product doesnt exists', async () => {
+      productMockRepository.findOne.mockReturnValue(null)
+      const mockSharp = jest
+        .fn()
+        .mockReturnValue({ resize: jest.fn().mockReturnValue(true) })
+      const mockedStream = jest
+        .fn()
+        .mockReturnValue({ pipe: jest.fn(() => mockSharp()) })
+      const removed = await service.uploadProductImage(
+        '1',
+        mockedStream,
+        'filename',
+        'file',
+      )
+      expect(removed).toBe(false)
+      expect(mockedStream).toBeCalledTimes(0)
+      expect(mockSharp).toBeCalledTimes(0)
+      expect(productMockRepository.findOne).toBeCalledTimes(1)
+      expect(productMockRepository.update).toBeCalledTimes(0)
+    })
+  })
+  describe('removeProductImage', () => {
+    it('should remove a product image', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      product.images = ['url1', 'url2', 'url3']
+      const imagesFiltered = product.images.filter(imgURL => imgURL !== 'url1')
+      productMockRepository.findOne.mockReturnValue(product)
+      mS3Instance.deleteObject.mockReturnValue(true)
+      productMockRepository.update.mockReturnValue(product)
+
+      const removed = await service.removeProductImage('1', 'url1')
+
+      expect(removed).toBe(true)
+      expect(imagesFiltered).toStrictEqual(['url2', 'url3'])
+      expect(productMockRepository.findOne).toBeCalledTimes(1)
+      expect(productMockRepository.update).toBeCalledTimes(1)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(1)
+    })
+    it('should remove a product image', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      product.images = ['url1', 'url2', 'url3']
+      const imagesFiltered = product.images.filter(imgURL => imgURL !== 'url1')
+      productMockRepository.findOne.mockReturnValue(product)
+      mS3Instance.deleteObject.mockReturnValue(true)
+      productMockRepository.update.mockReturnValue(product)
+
+      const removed = await service.removeProductImage('1', 'url1')
+
+      expect(removed).toBe(true)
+      expect(imagesFiltered).toStrictEqual(['url2', 'url3'])
+      expect(productMockRepository.findOne).toBeCalledTimes(1)
+      expect(productMockRepository.update).toBeCalledTimes(1)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(1)
+    })
+    it('should not remove because product doesnt exists', async () => {
+      productMockRepository.findOne.mockReturnValue(null)
+      const removed = await service.removeProductImage('1', 'url1')
+      expect(removed).toBe(false)
+      expect(productMockRepository.findOne).toBeCalledTimes(1)
+      expect(productMockRepository.update).toBeCalledTimes(0)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(0)
+    })
+    it('should not remove because product doesnt have images', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      productMockRepository.findOne.mockReturnValue(product)
+      const removed = await service.removeProductImage('1', 'url1')
+      expect(removed).toBe(false)
+      expect(productMockRepository.findOne).toBeCalledTimes(1)
+      expect(productMockRepository.update).toBeCalledTimes(0)
+      expect(mS3Instance.deleteObject).toBeCalledTimes(0)
+    })
+  })
 })

@@ -203,8 +203,8 @@ export class ProductService {
     if (!product) {
       return false
     }
-    if (!product.images) {
-      product.images = []
+    if (!product.images || product.images.length === 0) {
+      return false
     }
     product.images = product.images.filter(imgUrl => imgUrl !== url)
     const filename = url.split('.com/')[1]

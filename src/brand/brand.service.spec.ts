@@ -161,7 +161,7 @@ describe('brand service', () => {
         .mockReturnValue({ resize: jest.fn().mockReturnValue(true) })
       const mockedStream = jest
         .fn()
-        .mockReturnValue({ pipe: jest.fn().mockReturnValue(mockSharp()) })
+        .mockReturnValue({ pipe: jest.fn(() => mockSharp()) })
       const updatedBrand = await service.uploadLogo(
         '1',
         mockedStream,
