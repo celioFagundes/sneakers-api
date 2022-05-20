@@ -70,6 +70,76 @@ describe('Product service', () => {
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
+  describe('getAllNoFilter', () => {
+    it('should return all products', async () => {
+      const product = TestUtil.giveMeAValidProduct()
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const products = await service.getAllNoFilter()
+      expect(products).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+    })
+  })
+  describe('getByCategory', () =>
+    it('should return a product that matches the category', async () => {
+      const category = TestUtil.giveMeAValidCategory()
+      const product = TestUtil.giveMeAValidProduct()
+      categoryMockRepository.findOne.mockReturnValue(category)
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productsByCategory = await service.getByCategory('Valid category')
+      expect(productsByCategory).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(categoryMockRepository.findOne).toBeCalledTimes(1)
+    }))
+  describe('getByCategoryAndGender', () => {
+    it('should return limited products that matches the category and gender', async () => {
+      const category = TestUtil.giveMeAValidCategory()
+      const product = TestUtil.giveMeAValidProduct()
+      categoryMockRepository.findOne.mockReturnValue(category)
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productByCategorydAndGender = await service.getByCategoryAndGender(
+        'Valid Category',
+        'Valid Gender',
+        3,
+      )
+      expect(productByCategorydAndGender).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(categoryMockRepository.findOne).toBeCalledTimes(1)
+    })
+    it('should return unlimited products that matches the category and gender', async () => {
+      const category = TestUtil.giveMeAValidCategory()
+      const product = TestUtil.giveMeAValidProduct()
+      categoryMockRepository.findOne.mockReturnValue(category)
+      productMockRepository.find.mockReturnValue([
+        product,
+        product,
+        product,
+        product,
+        product,
+        product,
+      ])
+      const productByCategoryAndGender = await service.getByCategoryAndGender(
+        'Valid category',
+        'Valid Gender',
+        null,
+      )
+      expect(productByCategoryAndGender).toHaveLength(6)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(categoryMockRepository.findOne).toBeCalledTimes(1)
+    })
+  })
+  describe('getByCategoryLimited', () =>
+    it('should return limited products that matches the category', async () => {
+      const category = TestUtil.giveMeAValidCategory()
+      const product = TestUtil.giveMeAValidProduct()
+      categoryMockRepository.findOne.mockReturnValue(category)
+      productMockRepository.find.mockReturnValue([product, product, product])
+      const productByCategoryLimited = await service.getByCategoryLimited(
+        'Valid category',
+      )
+      expect(productByCategoryLimited).toHaveLength(3)
+      expect(productMockRepository.find).toBeCalledTimes(1)
+      expect(categoryMockRepository.findOne).toBeCalledTimes(1)
+    }))
   describe('getByBrand', () =>
     it('should return a product that matches the brand', async () => {
       const brand = TestUtil.giveMeAValidBrand()
